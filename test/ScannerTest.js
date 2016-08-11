@@ -1,15 +1,17 @@
-describe("Foundation.Scanner", function () {
+import Scanner from '../lib/Scanner'
+
+describe("Scanner", function () {
 	var scanner = null;
 	var dialectedScanner = null;
 
 	beforeEach(function () {
-		scanner = new Foundation.Scanner([
+		scanner = new Scanner([
 			{"dot": /\./},
 			{"ident": /\w+/},
 			{"space": /\s+/}
 		]);
 
-		dialectedScanner = new Foundation.Scanner({
+		dialectedScanner = new Scanner({
 			"foo": [
 				{"num": /\d+/},
 				{"other": /.+/}
@@ -127,7 +129,7 @@ describe("Foundation.Scanner", function () {
 		})
 
 		it("should not crash when a LINE SEPARATOR character is in the input string", function () {
-			scanner = new Foundation.Scanner([ {"tagstart": /</}, {"text": /[^<]+/} ]);
+			scanner = new Scanner([ {"tagstart": /</}, {"text": /[^<]+/} ]);
 			scanner.setSource("hello\n world \u2028 <br>\n foo\n");
 			var generateTokens = function () { while (scanner.nextToken()) { /* noop */ } };
 			expect(generateTokens).not.toThrow();
