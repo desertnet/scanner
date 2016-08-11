@@ -1,0 +1,29 @@
+{
+  "name": "@desertnet/scanner",
+  "version": "0.0.0",
+  "description": "A regex-based string scanner/tokenizer",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --compilers js:babel-register"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/desertnet/scanner.git"
+  },
+  "keywords": [
+    "scanner",
+    "tokenizer"
+  ],
+  "author": "Eric McCarthy <eric@limulus.net> (http://www.limulus.net/)",
+  "license": "SEE LICENSE IN LICENSE",
+  "bugs": {
+    "url": "https://github.com/desertnet/scanner/issues"
+  },
+  "homepage": "https://github.com/desertnet/scanner#readme",
+  "devDependencies": {
+    "babel-cli": "^6.11.4",
+    "babel-preset-es2015": "^6.13.2",
+    "babel-register": "^6.11.6",
+    "mocha": "^3.0.2"
+  }
+}
