@@ -1,3 +1,5 @@
+import {expect} from 'chai'
+
 import Scanner from '../lib/Scanner'
 
 describe("Scanner", function () {
@@ -28,19 +30,19 @@ describe("Scanner", function () {
       dialectedScanner.pushDialect("foo");
       dialectedScanner.pushDialect("bar");
       dialectedScanner.setSource("hi");
-      expect(dialectedScanner.dialectStack()).toEqual([]);
+      expect(dialectedScanner.dialectStack()).to.deep.equal([]);
     })
 
     it("should set the current dialect to null if scanner has more than one dialect", function () {
       dialectedScanner.pushDialect("foo");
       dialectedScanner.pushDialect("bar");
       dialectedScanner.setSource("hi");
-      expect(dialectedScanner.currentDialect()).toBeNull();
+      expect(dialectedScanner.currentDialect()).to.be.null;
     })
 
     it("should not set the current dialect to null if the scanner has only one dialect", function () {
       scanner.setSource("hi");
-      expect(scanner.currentDialect()).not.toBeNull();
+      expect(scanner.currentDialect()).not.to.be.null;
     })
   })
 
@@ -53,12 +55,12 @@ describe("Scanner", function () {
       var desTok = scanner.nextToken();
       var eofTok = scanner.nextToken();
 
-      expect(netTok.type).toBe("ident");
-      expect(netTok.value).toBe("net");
-      expect(dotTok.type).toBe("dot");
-      expect(desTok.type).toBe("ident");
-      expect(desTok.value).toBe("desert");
-      expect(eofTok).toBe(null);
+      expect(netTok.type).to.equal("ident");
+      expect(netTok.value).to.equal("net");
+      expect(dotTok.type).to.equal("dot");
+      expect(desTok.type).to.equal("ident");
+      expect(desTok.value).to.equal("desert");
+      expect(eofTok).to.equal(null);
     });
 
     it("should produce tokens with correct column and line numbers", function () {
@@ -71,14 +73,14 @@ describe("Scanner", function () {
         tokens.push(tok);
       }
 
-      expect(tokens[0].line).toBe(1);
-      expect(tokens[0].column).toBe(1);
-      expect(tokens[1].line).toBe(1);
-      expect(tokens[1].column).toBe(5);
-      expect(tokens[2].line).toBe(2);
-      expect(tokens[2].column).toBe(2);
-      expect(tokens[3].line).toBe(4);
-      expect(tokens[3].column).toBe(1);
+      expect(tokens[0].line).to.equal(1);
+      expect(tokens[0].column).to.equal(1);
+      expect(tokens[1].line).to.equal(1);
+      expect(tokens[1].column).to.equal(5);
+      expect(tokens[2].line).to.equal(2);
+      expect(tokens[2].column).to.equal(2);
+      expect(tokens[3].line).to.equal(4);
+      expect(tokens[3].column).to.equal(1);
     });
 
     it("should throw errors with relevant line and column numbers", function () {
@@ -97,22 +99,22 @@ describe("Scanner", function () {
         error = e;
       }
 
-      expect(tokens.length).toBe(3);
-      expect(error).not.toBeNull();
-      expect(error.name).toBe("ScannerError");
-      expect(error.index).toBe(14);
-      expect(error.line).toBe(3);
-      expect(error.column).toBe(5);
+      expect(tokens.length).to.equal(3);
+      expect(error).not.to.be.null;
+      expect(error.name).to.equal("ScannerError");
+      expect(error.index).to.equal(14);
+      expect(error.line).to.equal(3);
+      expect(error.column).to.equal(5);
     });
 
     it("should only process expected tokens", function () {
       scanner.setSource("word. word");
 
       var tok = scanner.nextToken(["dot", "ident"]);
-      expect(tok.type).toBe("ident");
+      expect(tok.type).to.equal("ident");
 
       tok = scanner.nextToken(["dot", "ident"]);
-      expect(tok.type).toBe("dot");
+      expect(tok.type).to.equal("dot");
 
       var error = null;
       try {
@@ -121,30 +123,30 @@ describe("Scanner", function () {
       catch (e) {
         error = e;
       }
-      expect(error).not.toBeNull();
+      expect(error).not.to.be.null;
     });
 
     it("should throw an error when there is no current dialect", function () {
-      expect(function () { dialectedScanner.nextToken() }).toThrow();
+      expect(function () { dialectedScanner.nextToken() }).to.throw();
     })
 
     it("should not crash when a LINE SEPARATOR character is in the input string", function () {
       scanner = new Scanner([ {"tagstart": /</}, {"text": /[^<]+/} ]);
       scanner.setSource("hello\n world \u2028 <br>\n foo\n");
       var generateTokens = function () { while (scanner.nextToken()) { /* noop */ } };
-      expect(generateTokens).not.toThrow();
+      expect(generateTokens).not.to.throw();
     })
   })
 
   describe("#currentDialect", function () {
     it("should return 'main' when the original dialect is the active one", function () {
-      expect(scanner.currentDialect()).toEqual("main");
+      expect(scanner.currentDialect()).to.equal("main");
     })
   })
 
   describe("#dialects", function () {
     it("should return an array of available dialect names", function () {
-      expect(scanner.dialects()).toEqual(["main"]);
+      expect(scanner.dialects()).to.deep.equal(["main"]);
     })
   })
 
@@ -155,18 +157,18 @@ describe("Scanner", function () {
 
       dialectedScanner.setDialect("foo");
       var tok1 = dialectedScanner.nextToken();
-      expect(tok1.type).toEqual("num");
+      expect(tok1.type).to.equal("num");
 
       dialectedScanner.setDialect("bar");
       var tok2 = dialectedScanner.nextToken();
-      expect(tok2.type).toEqual("word");
+      expect(tok2.type).to.equal("word");
     })
   });
 
   describe("#pushDialect", function () {
     it("should set the current dialect", function () {
       dialectedScanner.pushDialect("bar");
-      expect(dialectedScanner.currentDialect()).toBe("bar");
+      expect(dialectedScanner.currentDialect()).to.equal("bar");
     })
   })
 
@@ -175,7 +177,7 @@ describe("Scanner", function () {
       dialectedScanner.pushDialect("foo");
       dialectedScanner.pushDialect("bar");
       dialectedScanner.popDialect();
-      expect(dialectedScanner.currentDialect()).toBe("foo");
+      expect(dialectedScanner.currentDialect()).to.equal("foo");
     })
   })
 });
