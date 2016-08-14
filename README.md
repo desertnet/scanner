@@ -137,9 +137,11 @@ Returns a `Token` object for the next matching token in the source string. To sc
 
 The optional `expectedTokens` parameter is an array of token type names for the current dialect. Use this if it makes sense to only scan for a subset of token types. However, if you find yourself doing this, it may be better to switch to a multi-dialect scanner.
 
-### Token
+### new Scanner.Token(type, value, index, line, column)
 
-Instances of the `Token` class cannot be instantiated directly. Instead, they are returned to you by `scanner.nextToken()`. They have the following readable properties:
+Generally, instances of the `Token` class should not be instantiated directly. However the constructor is publicly available as it can be convenient to instantiate your own in tests.
+
+In typical usage, they are returned to you by `scanner.nextToken()`. They have the following readable properties:
 
   - `type`: The name of the token type. (A string.)
   - `value`: The matching substring from the input.
