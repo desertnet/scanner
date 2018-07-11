@@ -1,1 +1,16 @@
-{ "presets": ["es2015"] }
+{
+  "presets": [
+    ["@babel/env", {
+      "targets": {
+        "browsers": "defaults"
+      }
+    }]
+  ],
+  "env": {
+    "test": {
+      "plugins": [
+        "istanbul"
+      ]
+    }
+  }
+}

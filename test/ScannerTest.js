@@ -1,6 +1,6 @@
 import {expect} from 'chai'
 
-import Scanner from '../lib/Scanner'
+import Scanner from '../src'
 
 describe("Scanner", function () {
   var scanner = null;
