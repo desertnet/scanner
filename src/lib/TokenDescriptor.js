@@ -6,12 +6,12 @@
  */
 export default class TokenDescriptor {
   constructor (type, regex) {
-    this.type = type;
+    this.type = type
 
     // Normalize regex flags.
-    var flags = "gm";
-    if (regex.ignoreCase) flags += "i";
+    var flags = "gm"
+    if (regex.ignoreCase) flags += "i"
 
-    this.regex = new RegExp(regex.source, flags);
+    this.regex = new RegExp(regex.source, flags)
   }
 }

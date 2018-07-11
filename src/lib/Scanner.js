@@ -16,45 +16,45 @@ export default class Scanner {
      * @private
      * @type {Dialect?}
      */
-    this._dialect = null;
+    this._dialect = null
 
     /**
      * The dialect stack.
      * @private
      * @type {Array.<string>}
      */
-    this._dialectStack = [];
+    this._dialectStack = []
 
     /**
      * All the dialects this scanner can use.
      * @private
      * @type {Object.<string,Dialect>}
      */
-    this._dialects = {};
+    this._dialects = {}
 
     /**
      * @private
      * @type {string?}
      */
-    this._source = null;
+    this._source = null
 
     /**
      * @private
      * @type {number}
      */
-    this._pos = 0;
+    this._pos = 0
 
     /**
      * @private
      * @type {number}
      */
-    this._line = 0;
+    this._line = 0
 
     /**
      * @private
      * @type {number}
      */
-    this._column = 0;
+    this._column = 0
 
     // Set up dialects specified in the constructor call.
     if (descriptors) {
@@ -62,19 +62,19 @@ export default class Scanner {
       // array, then we should expect just one dialect. So let's call
       // it "main".
       if (Array.isArray(descriptors)) {
-        descriptors = {"main": descriptors};
+        descriptors = {"main": descriptors}
       }
 
       // Assuming we have an object containing dialect descriptons...
       if (Object.keys(descriptors).length) {
         // Loop through the dialects and add them one by one.
         Object.keys(descriptors).forEach(name => {
-          this.addDialect(name, descriptors[name]);
-        });
+          this.addDialect(name, descriptors[name])
+        })
 
         // Set the current dialect if there is only one dialect.
         if (Object.keys(descriptors).length === 1) {
-          this.setDialect(Object.keys(descriptors)[0]);
+          this.setDialect(Object.keys(descriptors)[0])
         }
       }
     }
@@ -85,16 +85,16 @@ export default class Scanner {
    * @param {string?} sourceStr
    */
   setSource (sourceStr) {
-    this._source = sourceStr + "";  // Copy the string.
+    this._source = `${sourceStr}`  // Copy the string.
 
-    this._pos = 0;
-    this._line = 1;
-    this._column = 1;
+    this._pos = 0
+    this._line = 1
+    this._column = 1
 
     if (this.dialects().length > 1) {
-      this.setDialect(null);
+      this.setDialect(null)
     }
-    this._dialectStack = [];
+    this._dialectStack = []
   }
 
   /**
@@ -103,7 +103,7 @@ export default class Scanner {
    * @return {string?}
    */
   currentDialect () {
-    return this._dialect ? this._dialect.name() : null;
+    return this._dialect ? this._dialect.name() : null
   }
 
   /**
@@ -112,7 +112,7 @@ export default class Scanner {
    * @return {Array.<string>}
    */
   dialects () {
-    return Object.keys(this._dialects || {});
+    return Object.keys(this._dialects || {})
   }
 
   /**
@@ -123,11 +123,11 @@ export default class Scanner {
    */
   addDialect (name, descriptors) {
     if (this._dialects[name]) {
-      throw new ScannerError("Dialect \""+name+"\" already exists.", this);
+      throw new ScannerError(`Dialect "${name}" already exists.`, this)
     }
 
-    var dialect = this.createDialect(name, descriptors);
-    this._dialects[name] = dialect;
+    var dialect = this.createDialect(name, descriptors)
+    this._dialects[name] = dialect
   }
 
   /**
@@ -139,15 +139,15 @@ export default class Scanner {
    */
   setDialect (name) {
     if (name === null) {
-      this._dialect = null;
-      return;
+      this._dialect = null
+      return
     }
 
-    if (! this._dialects[name]) {
-      throw new ScannerError("No such dialect: \""+name+"\".", this);
+    if (!this._dialects[name]) {
+      throw new ScannerError(`No such dialect: "${name}".`, this)
     }
 
-    this._dialect = this._dialects[name];
+    this._dialect = this._dialects[name]
   }
 
   /**
@@ -158,9 +158,9 @@ export default class Scanner {
    */
   pushDialect (name) {
     if (this._dialect) {
-      this._dialectStack.push(this.currentDialect());
+      this._dialectStack.push(this.currentDialect())
     }
-    this.setDialect(name);
+    this.setDialect(name)
   }
 
   /**
@@ -169,7 +169,7 @@ export default class Scanner {
    * @public
    */
   popDialect () {
-    this.setDialect(this._dialectStack.pop() || null);
+    this.setDialect(this._dialectStack.pop() || null)
   }
 
   /**
@@ -178,7 +178,7 @@ export default class Scanner {
    * @return {Array.<string>}
    */
   dialectStack () {
-    return this._dialectStack;
+    return this._dialectStack
   }
 
   /**
@@ -190,37 +190,37 @@ export default class Scanner {
    * @return {Dialect}
    */
   createDialect (name, descriptors) {
-    var collectedDescriptors = [];
+    var collectedDescriptors = []
 
-    var typesSeen = {};
+    var typesSeen = {}
     for (var i = 0; i < descriptors.length; i++) {
-      var descriptor = descriptors[i];
+      var descriptor = descriptors[i]
 
-      var j = 0;
+      var j = 0
       for (var type in descriptor) {
         // Don't allow more than one type/regex pair per descriptor.
         if (j >= 1) throw new ScannerError(
           "Found more than one type/regex pair in descriptor.",
           this
-        );
+        )
 
         // Make sure we don't run into duplicate descriptor type names.
         if (typesSeen[type]) {
           throw new ScannerError(
-            "Found duplicate descriptor type name: " + type, this
-          );
+            `Found duplicate descriptor type name: ${type}`, this
+          )
         }
-        typesSeen[type] = true;
+        typesSeen[type] = true
 
         collectedDescriptors.push(
           new TokenDescriptor(type, descriptor[type])
-        );
+        )
 
-        j++;
+        j++
       }
     }
 
-    return new Dialect(name, collectedDescriptors);
+    return new Dialect(name, collectedDescriptors)
   }
 
   /**
@@ -233,53 +233,53 @@ export default class Scanner {
    */
   nextToken (expectedTokens) {
     // Sanity check to ensure that we have a dialect currently selected.
-    if (! this._dialect) {
-      throw new ScannerError("Dialect was not set.", this);
+    if (!this._dialect) {
+      throw new ScannerError("Dialect was not set.", this)
     }
 
     // Sanity check to make sure caller has set us up with a source string.
     if (this._source === null) {
-      throw new ScannerError("Source string was not set.", this);
+      throw new ScannerError("Source string was not set.", this)
     }
 
     // EOF
     if (this._pos === this._source.length) {
-      return null;
+      return null
     }
 
     // Get the list of token descriptors we're going to iterate over in our
     // attempt to match the source string.
-    var descriptors = this._dialect.descriptors();
+    var descriptors = this._dialect.descriptors()
     if (expectedTokens) {
-      descriptors = [];
-      for (var i = 0; i < expectedTokens.length; i++) {
-        var type = expectedTokens[i];
-        var descriptor = this._dialect.getDescriptor(type);
+      descriptors = []
+      for (let i = 0; i < expectedTokens.length; i++) {
+        var type = expectedTokens[i]
+        const descriptor = this._dialect.getDescriptor(type)
         if (!descriptor) {
-          throw new ScannerError("Unknown descriptor: "+type, this);
+          throw new ScannerError(`Unknown descriptor: ${type}`, this)
         }
-        descriptors.push(descriptor);
+        descriptors.push(descriptor)
       }
     }
 
-    var token = null;
-    for (var i = 0; i < descriptors.length; i++) {
-      var descriptor = descriptors[i];
+    var token = null
+    for (let i = 0; i < descriptors.length; i++) {
+      const descriptor = descriptors[i]
 
-      descriptor.regex.lastIndex = this._pos;
-      var match = descriptor.regex.exec(this._source);
+      descriptor.regex.lastIndex = this._pos
+      var match = descriptor.regex.exec(this._source)
       if (match) {
         // If our match didn't start at _pos, we haven't really matched
         // because the match is down the string somewhere. Ideally we'd
         // be able to use the "sticky" /y flag instead, proposed in ES6:
         // http://wiki.ecmascript.org/doku.php?id=harmony:regexp_y_flag
-        if (match.index != this._pos) continue;
+        if (match.index !== this._pos) continue
 
         // Keep track of what line we're on.
-        var lines = 0;
-        var lineMatches = match[0].match(/\r\n|\r|\n/g);
-        if (lineMatches) lines = lineMatches.length;
-        this._line += lines;
+        var lines = 0
+        var lineMatches = match[0].match(/\r\n|\r|\n/g)
+        if (lineMatches) lines = lineMatches.length
+        this._line += lines
 
         // Create the token!
         token = new Token(
@@ -288,40 +288,40 @@ export default class Scanner {
           this._pos,
           this._line,
           this._column
-        );
+        )
 
         // Keep track of the column we're on.
-        var colIncrement = match[0].length;
+        var colIncrement = match[0].length
         if (lines > 0) {
-          this._column = 1;
-          var columnMatch = match[0].match(/(?:\r\n|\r|\n).*?$/m);
-          colIncrement = columnMatch[0].replace(/^(?:\r\n|\r|\n)/, "").length;
+          this._column = 1
+          var columnMatch = match[0].match(/(?:\r\n|\r|\n).*?$/m)
+          colIncrement = columnMatch[0].replace(/^(?:\r\n|\r|\n)/, "").length
         }
-        this._column += colIncrement;
+        this._column += colIncrement
 
         // We do some special stuff when there's a zero-length match.
         // Not sure if it makes sense to have a scanner look for
         // zero length strings, but we want to be on the safe side.
-        var zeroLengthMatch = match[0].length === 0;
+        var zeroLengthMatch = match[0].length === 0
 
         // Fix IE's incorrect lastIndex value on zero-length matches.
         // See: http://blog.stevenlevithan.com/archives/exec-bugs
         if (zeroLengthMatch && descriptor.regex.lastIndex > match.index) {
-          descriptor.regex.lastIndex--;
+          descriptor.regex.lastIndex--
         }
 
         // Advance our pos pointer. If we hit a zero-length match, then
         // increment by one so we don't end up in an infinite loop.
-        this._pos = descriptor.regex.lastIndex + (zeroLengthMatch ? 1 : 0);
+        this._pos = descriptor.regex.lastIndex + (zeroLengthMatch ? 1 : 0)
 
         // We've matched a token, so we're done with the loop.
-        break;
+        break
       }
-    };
+    }
 
     // We were unable to match a token. Let's report the error.
-    if (! token) throw new ScannerError("Unexpected character.", this);
+    if (!token) throw new ScannerError("Unexpected character.", this)
 
-    return token;
-  };
+    return token
+  }
 }

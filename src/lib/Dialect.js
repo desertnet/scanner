@@ -11,19 +11,19 @@ export default class Dialect {
      * @private
      * @type {string}
      */
-    this._name = name;
+    this._name = name
 
     /**
      * @private
      * @type {Array.<TokenDescriptor>}
      */
-    this._descriptors = descriptors;
+    this._descriptors = descriptors
 
     /**
      * @private
      * @type {Object.<string,TokenDescriptor>|null}
      */
-    this._descriptorsHash = null;
+    this._descriptorsHash = null
   }
 
   /**
@@ -31,7 +31,7 @@ export default class Dialect {
    * @return {string}
    */
   name () {
-    return this._name;
+    return this._name
   }
 
   /**
@@ -39,7 +39,7 @@ export default class Dialect {
    * @return {Array.<TokenDescriptor>}
    */
   descriptors () {
-    return this._descriptors;
+    return this._descriptors
   }
 
   /**
@@ -52,13 +52,13 @@ export default class Dialect {
     // Initialize the descriptors hash if it isn't already defiend. This
     // just makes descriptor lookups fast.
     if (!this._descriptorsHash) {
-      this._descriptorsHash = {};
+      this._descriptorsHash = {}
       for (var i = 0; i < this._descriptors.length; i++) {
-        var descriptor = this._descriptors[i];
-        this._descriptorsHash[descriptor.type] = descriptor;
+        var descriptor = this._descriptors[i]
+        this._descriptorsHash[descriptor.type] = descriptor
       }
     }
 
-    return this._descriptorsHash[type] || null;
+    return this._descriptorsHash[type] || null
   }
 }
