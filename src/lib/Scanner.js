@@ -2,6 +2,7 @@ import Dialect from './Dialect'
 import TokenDescriptor from './TokenDescriptor'
 import Token from './Token'
 import ScannerError from './ScannerError'
+import assert from './assert'
 
 /**
  * Given a list of token descriptors, generate tokens from a string.
@@ -255,9 +256,7 @@ export default class Scanner {
       for (let i = 0; i < expectedTokens.length; i++) {
         var type = expectedTokens[i]
         const descriptor = this._dialect.getDescriptor(type)
-        if (!descriptor) {
-          throw new ScannerError(`Unknown descriptor: ${type}`, this)
-        }
+        assert(descriptor, `Unknown descriptor: ${type}`, this)
         descriptors.push(descriptor)
       }
     }

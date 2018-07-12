@@ -59,6 +59,6 @@ export default class Dialect {
       }
     }
 
-    return this._descriptorsHash[type] || null
+    return this._descriptorsHash[type]
   }
 }

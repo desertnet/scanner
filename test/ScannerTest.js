@@ -25,6 +25,15 @@ describe("Scanner", function () {
     })
   })
 
+  describe(`constructor()`, function () {
+    it(`should throw if given duplicate type descriptor names`, function () {
+      expect(() => new Scanner([
+        {"dot": /\./},
+        {"dot": /\./},
+      ])).to.throw(/duplicate/)
+    })
+  })
+
   describe("#setSource", function () {
     it("should reset the dialect stack", function () {
       dialectedScanner.pushDialect("foo")
@@ -136,6 +145,10 @@ describe("Scanner", function () {
       var generateTokens = function () { while (scanner.nextToken()) { /* noop */ } }
       expect(generateTokens).not.to.throw()
     })
+
+    it(`should throw an error if .setSource() has not been called`, function () {
+      expect(() => scanner.nextToken()).to.throw(/source string was not set/i)
+    })
   })
 
   describe("#currentDialect", function () {
@@ -147,6 +160,13 @@ describe("Scanner", function () {
   describe("#dialects", function () {
     it("should return an array of available dialect names", function () {
       expect(scanner.dialects()).to.deep.equal(["main"])
+    })
+  })
+
+  describe("#addDialect", function () {
+    it(`should throw when passed dialect has already been added`, function () {
+      expect(() => dialectedScanner.addDialect('foo', [{'dot':/\./}]))
+        .to.throw(/already exists/i)
     })
   })
 
@@ -162,6 +182,10 @@ describe("Scanner", function () {
       dialectedScanner.setDialect("bar")
       var tok2 = dialectedScanner.nextToken()
       expect(tok2.type).to.equal("word")
+    })
+
+    it(`should throw if passed dialect has not been added`, function () {
+      expect(() => scanner.setDialect('nonexist')).to.throw(/No such dialect/i)
     })
   })
 
