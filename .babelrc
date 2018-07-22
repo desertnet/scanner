@@ -2,8 +2,8 @@
   "presets": [
     ["@babel/env", {
       "targets": {
-        "browsers": "defaults"
-      }
+        "browsers": "since 2018"
+      },
     }]
   ],
   "env": {
