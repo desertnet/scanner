@@ -1,4 +1,5 @@
 import Dialect from './Dialect'
+import Token from './Token'
 
 export default class Scanner {
   constructor (subject) {
@@ -19,10 +20,11 @@ export default class Scanner {
       throw new TypeError(`Expected dialect arguement to be a Dialect`)
     }
 
-    let token
-    while ((token = this.determineNextTokenUsingDialect(dialect))) {
-      this.position = this.position + token.value.length
-      yield token
+    let tok
+    while ((tok = this.determineNextTokenUsingDialect(dialect))) {
+      const [identifier, endOffset] = tok
+      yield new Token(identifier, this.subject.slice(this.position, endOffset), this.position)
+      this.position = endOffset
     }
   }
 }

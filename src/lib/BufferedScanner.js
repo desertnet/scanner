@@ -18,7 +18,6 @@ export default class BufferedScanner extends Scanner {
     const tokenizer = tokenizerCache.tokenizerForDialect(dialect)
     tokenizer.subject = this.subject
 
-    const candidateTokens = tokenizer.findTokensAt(this.position)
-    return maxBy(candidateTokens, tok => tok.value.length)
+    return maxBy(tokenizer.findTokensAt(this.position), tok => tok[1])
   }
 }

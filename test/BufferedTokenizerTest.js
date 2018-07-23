@@ -1,6 +1,6 @@
 import {expect} from 'chai'
 
-import {BufferedTokenizer, TokenDefinition, Token} from '../src'
+import {BufferedTokenizer, TokenDefinition} from '../src'
 
 describe(`BufferedTokenizer`, function () {
   describe(`constructor()`, function () {
@@ -45,27 +45,27 @@ describe(`BufferedTokenizer`, function () {
       it(`should ignore case regex when ignoreCase is specified on token definition`, function () {
         tokenizer.subject = 'IF THEN'
         expect(tokenizer.findTokensAt(0))
-          .to.deep.equal([ new Token('IF', 'IF', 0) ])
+          .to.deep.equal([['IF', 2]])
       })
 
       it(`should match a token at start of string`, function () {
         tokenizer.subject = 'if then'
         expect(tokenizer.findTokensAt(0))
-          .to.deep.equal([ new Token('IF', 'if', 0) ])
+          .to.deep.equal([['IF', 2]])
       })
 
       it(`should match token at start of offset`, function () {
         tokenizer.subject = 'if then'
         expect(tokenizer.findTokensAt(3))
-          .to.deep.equal([ new Token('THEN', 'then', 3) ])
+          .to.deep.equal([['THEN', 7]])
       })
 
       it(`should match multiple tokens when more than one defintion matches`, function () {
         tokenizer.subject = 'a/*b /* comment */'
         expect(tokenizer.findTokensAt(1))
           .to.deep.equal([
-            new Token('DIVIDE', '/', 1),
-            new Token('COMMENT', '/*b /* comment */', 1)
+            ['DIVIDE', 2],
+            ['COMMENT', 18],
           ])
       })
     })

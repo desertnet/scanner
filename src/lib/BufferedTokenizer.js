@@ -1,5 +1,4 @@
 import TokenDefinition from './TokenDefinition'
-import Token from './Token'
 
 const regexesSym = Symbol('regexes')
 
@@ -31,9 +30,8 @@ export default class BufferedTokenizer {
 
     for (const [tokenDef, regex] of this[regexesSym]) {
       regex.lastIndex = offset
-      const match = regex.exec(this.subject)
-      if (match) {
-        tokens.push(new Token(tokenDef.identifier, match[0], offset))
+      if (regex.test(this.subject)) {
+        tokens.push([tokenDef.identifier, regex.lastIndex])
       }
     }
 
