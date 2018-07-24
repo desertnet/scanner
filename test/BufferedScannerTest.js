@@ -1,7 +1,8 @@
 import {expect} from 'chai'
+import assert from 'assert'
 
 import {
-  BufferedScanner, Scanner, TokenDefinition, Dialect, Token
+  BufferedScanner, Scanner, TokenDefinition, Dialect
 } from '../src'
 
 describe(`BufferedScanner`, function () {
@@ -26,7 +27,7 @@ describe(`BufferedScanner`, function () {
 
     let scanner
     beforeEach(function () {
-      scanner = new BufferedScanner(`if (this) then {that}`)
+      scanner = new BufferedScanner(`if (this)\nthen {that}`)
     })
 
     describe(`generateTokensUsingDialect()`, function () {
@@ -37,19 +38,28 @@ describe(`BufferedScanner`, function () {
           tokens.push(token)
         }
 
-        expect(tokens).to.deep.equal([
-          new Token('IF', 'if', 0),
-          new Token('SPACE', ' ', 2),
-          new Token('LPAREN', '(', 3),
-          new Token('THIS', 'this', 4),
-          new Token('RPAREN', ')', 8),
-          new Token('SPACE', ' ', 9),
-          new Token('THEN', 'then', 10),
-          new Token('SPACE', ' ', 14),
-          new Token('LBRACE', '{', 15),
-          new Token('VAR', 'that', 16),
-          new Token('RBRACE', '}', 20),
-        ])
+        const expected = [
+          {type: 'IF', value: 'if', start: 0, line: 1, column: 1},
+          {type: 'SPACE', value: ' ', start: 2, line: 1, column: 3},
+          {type: 'LPAREN', value: '(', start: 3, line: 1, column: 4},
+          {type: 'THIS', value: 'this', start: 4, line: 1, column: 5},
+          {type: 'RPAREN', value: ')', start: 8, line: 1, column: 9},
+          {type: 'SPACE', value: '\n', start: 9, line: 1, column: 10},
+          {type: 'THEN', value: 'then', start: 10, line: 2, column: 1},
+          {type: 'SPACE', value: ' ', start: 14, line: 2, column: 5},
+          {type: 'LBRACE', value: '{', start: 15, line: 2, column: 6},
+          {type: 'VAR', value: 'that', start: 16, line: 2, column: 7},
+          {type: 'RBRACE', value: '}', start: 20, line: 2, column: 11},
+        ]
+
+        tokens.forEach((token, i) => {
+          ['type', 'value', 'start', 'line', 'column'].forEach(prop => {
+            assert.strictEqual(
+              token[prop], expected[i][prop],
+              `Got '${token[prop]}' for '${prop}' of expected token: ${JSON.stringify(expected[i])}`
+            )
+          })
+        })
       })
     })
   })

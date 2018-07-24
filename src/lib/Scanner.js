@@ -1,5 +1,8 @@
 import Dialect from './Dialect'
 import Token from './Token'
+import LineNumberMap from './LineNumberMap'
+
+const lineNumberMapProp = Symbol('lineNumberMapProp')
 
 export default class Scanner {
   constructor (subject) {
@@ -9,6 +12,14 @@ export default class Scanner {
 
     this.subject = subject
     this.position = 0
+    this[lineNumberMapProp] = null
+  }
+
+  get lineNumberMap () {
+    if (this[lineNumberMapProp] === null) {
+      this[lineNumberMapProp] = new LineNumberMap(this.subject)
+    }
+    return this[lineNumberMapProp]
   }
 
   *generateTokensUsingDialect (dialect) {
@@ -23,8 +34,14 @@ export default class Scanner {
     let tok
     while ((tok = this.determineNextTokenUsingDialect(dialect))) {
       const [identifier, endOffset] = tok
-      yield new Token(identifier, this.subject.slice(this.position, endOffset), this.position)
+      const token = new Token({
+        scanner: this,
+        type: identifier,
+        start: this.position,
+        end: endOffset,
+      })
       this.position = endOffset
+      yield token
     }
   }
 }
