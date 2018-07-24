@@ -2,7 +2,8 @@ import {IntervalTree} from 'node-interval-tree'
 
 export default class LineNumberMap {
   constructor (initialChunk) {
-    this.offset = 0
+    this.lastLineStart = 0
+    this.lastLineLengthFromPrevChunks = 0
     this.lineNumber = 1
     this.intervalTree = new IntervalTree()
     this.addChunk(initialChunk)
@@ -10,19 +11,23 @@ export default class LineNumberMap {
 
   addChunk (chunk) {
     const lineRe = /.*?(?:\r\n|\r|\n)/gy
+    lineRe.lastIndex = 0
 
-    let lastLineStart = 0
-    while (lineRe.test(chunk)) {
+    let match, lastLineOffsetInChunk = 0
+    while ((match = lineRe.exec(chunk))) {
       this.intervalTree.insert({
-        low: lastLineStart + this.offset,
-        high: lineRe.lastIndex - 1 + this.offset,
+        low: this.lastLineStart,
+        high: this.lastLineStart + this.lastLineLengthFromPrevChunks + match[0].length - 1,
         lineno: this.lineNumber,
       })
-      lastLineStart = lineRe.lastIndex
+
+      lastLineOffsetInChunk = match.index + match[0].length
+      this.lastLineStart += this.lastLineLengthFromPrevChunks + match[0].length
+      this.lastLineLengthFromPrevChunks = 0
       this.lineNumber += 1
     }
 
-    this.offset += lastLineStart
+    this.lastLineLengthFromPrevChunks += chunk.length - lastLineOffsetInChunk
   }
 
   getLineNumberForOffset (offset) {
@@ -33,7 +38,7 @@ export default class LineNumberMap {
 
   getColumnForOffset (offset) {
     const intervals = this.intervalTree.search(offset, offset)
-    if (intervals.length === 0) return offset - this.offset + 1
+    if (intervals.length === 0) return offset - this.lastLineStart + 1
     return offset - intervals[0].low + 1
   }
 }
