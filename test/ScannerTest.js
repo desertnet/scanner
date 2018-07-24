@@ -27,6 +27,13 @@ describe(`Scanner`, function () {
       scanner = new Scanner('foo')
     })
 
+    describe(`determineNextTokenUsingDialect()`, function () {
+      it(`should always throw`, function () {
+        expect(() => scanner.determineNextTokenUsingDialect())
+          .to.throw(/overridden/i)
+      })
+    })
+
     describe(`generateTokensUsingDialect()`, function () {
       it(`should throw when passed no arguments`, async function () {
         await expect(() => scanner.generateTokensUsingDialect().next())

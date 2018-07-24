@@ -22,6 +22,10 @@ export default class Scanner {
     return this[lineNumberMapProp]
   }
 
+  determineNextTokenUsingDialect () {
+    throw new Error(`determineNextTokenUsingDialect must be overridden by subclass`)
+  }
+
   *generateTokensUsingDialect (dialect) {
     if (!dialect) {
       throw new TypeError(`Expected dialect argument`)
