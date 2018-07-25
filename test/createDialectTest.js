@@ -19,6 +19,14 @@ describe(`createDialect()`, function () {
     expect(() => createDialect({})).to.throw(TypeError)
   })
 
+  it(`should not throw when token types are Symbols`, function () {
+    expect(() => createDialect({[Symbol()]: 'foo'})).to.not.throw()
+  })
+
+  it(`should throw when token types are mixed strings and Symbols`, function () {
+    expect(() => createDialect({[Symbol()]: 'foo', bar: 'bar'})).to.throw(TypeError)
+  })
+
   context(`returned value`, function () {
     it(`should be a Dialect object`, function () {
       expect(createDialect({foo: 'foo'})).to.be.an.instanceof(Dialect)
