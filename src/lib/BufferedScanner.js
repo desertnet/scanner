@@ -1,4 +1,4 @@
-import Scanner from './Scanner'
+import Scanner, {EOF} from './Scanner'
 import BufferedTokenizer from './BufferedTokenizer'
 import TokenizerCache from './TokenizerCache'
 import maxBy from 'lodash.maxby'
@@ -13,7 +13,7 @@ export default class BufferedScanner extends Scanner {
   }
 
   determineNextTokenUsingDialect (dialect) {
-    if (this.position >= this.subject.length) return null
+    if (this.position >= this.subject.length) return [EOF]
 
     const tokenizer = tokenizerCache.tokenizerForDialect(dialect)
     tokenizer.subject = this.subject

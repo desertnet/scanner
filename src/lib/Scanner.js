@@ -4,6 +4,9 @@ import LineNumberMap from './LineNumberMap'
 
 const lineNumberMapProp = Symbol('lineNumberMapProp')
 
+export const EOF = Symbol('EOF')
+export const UnexpectedCharacter = Symbol('UnexpectedCharacter')
+
 export default class Scanner {
   constructor (subject) {
     if (!subject) {
@@ -38,14 +41,27 @@ export default class Scanner {
     let tok
     while ((tok = this.determineNextTokenUsingDialect(dialect))) {
       const [identifier, endOffset] = tok
+
+      if (identifier === EOF) return
+
       const token = new Token({
         scanner: this,
         type: identifier,
         start: this.position,
         end: endOffset,
       })
+
       this.position = endOffset
       yield token
     }
+
+    // If we got here it means determineNextTokenUsingDialect() could not
+    // match the next character.
+    return new Token({
+      scanner: this,
+      type: UnexpectedCharacter,
+      start: this.position,
+      end: this.position + 1,
+    })
   }
 }

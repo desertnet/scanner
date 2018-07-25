@@ -1,6 +1,9 @@
 import {expect} from 'chai'
+import sinon from 'sinon'
 
-import {Scanner, Dialect, TokenDefinition} from '../src'
+import {
+  Scanner, Dialect, TokenDefinition, Token, UnexpectedCharacter
+} from '../src'
 
 describe(`Scanner`, function () {
   describe(`constructor()`, function () {
@@ -49,6 +52,19 @@ describe(`Scanner`, function () {
         expect(scanner.generateTokensUsingDialect(dialect))
           .to.have.property(Symbol.iterator)
           .that.is.a('function')
+      })
+
+      context(`when nothing in dialect matches`, function () {
+        it(`should return UnexpectedCharacter Token`, function () {
+          sinon.stub(scanner, 'determineNextTokenUsingDialect')
+            .returns(undefined)
+          expect(scanner.generateTokensUsingDialect(dialect).next().value)
+            .to.be.an.instanceof(Token)
+            .and.to.include({
+              type: UnexpectedCharacter,
+              value: 'f'
+            })
+        })
       })
     })
   })
