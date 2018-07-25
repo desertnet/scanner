@@ -2,13 +2,13 @@ import {expect} from 'chai'
 import assert from 'assert'
 
 import {
-  BufferedScanner, Scanner, TokenDefinition, Dialect
+  BufferedRegExpScanner, Scanner, TokenDefinition, Dialect
 } from '../src'
 
-describe(`BufferedScanner`, function () {
+describe(`BufferedRegExpScanner`, function () {
   describe(`constructor()`, function () {
     it(`should return a subclass of Scanner`, function () {
-      expect(new BufferedScanner('foo')).to.be.instanceof(Scanner)
+      expect(new BufferedRegExpScanner('foo')).to.be.instanceof(Scanner)
     })
   })
 
@@ -27,7 +27,7 @@ describe(`BufferedScanner`, function () {
 
     let scanner
     beforeEach(function () {
-      scanner = new BufferedScanner(`if (this)\nthen {that}`)
+      scanner = new BufferedRegExpScanner(`if (this)\nthen {that}`)
     })
 
     describe(`generateTokensUsingDialect()`, function () {

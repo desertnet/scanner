@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-const {BufferedScanner, Dialect, TokenDefinition} = require('./dist')
-// import {BufferedScanner, Dialect, TokenDefinition} from './src'
+const {BufferedRegExpScanner, Dialect, TokenDefinition} = require('./dist')
+// import {BufferedRegExpScanner, Dialect, TokenDefinition} from './src'
 
 const length = 100000
 const subject = Array(length).fill(`if (this) then {that}`, 0, length).join('\n')
@@ -18,7 +18,7 @@ const myLang = new Dialect([
   new TokenDefinition('VAR', String.raw`\w+`),
 ])
 
-let scanner = new BufferedScanner(subject)
+let scanner = new BufferedRegExpScanner(subject)
 
 console.log(`scanning ${Math.floor(subject.length / 1024)}KB equivalent file`)
 
@@ -29,7 +29,7 @@ for (const _tok of scanner.generateTokensUsingDialect(myLang)) {
 console.log(`raw scan: ${Date.now() - t0}ms`)
 
 const tokens = []
-scanner = new BufferedScanner(subject)
+scanner = new BufferedRegExpScanner(subject)
 const t1 = Date.now()
 for (const tok of scanner.generateTokensUsingDialect(myLang)) {
   tokens.push(tok)

@@ -1,13 +1,13 @@
 import Scanner, {EOF} from './Scanner'
-import BufferedTokenizer from './BufferedTokenizer'
+import BufferedRegExpTokenizer from './BufferedRegExpTokenizer'
 import TokenizerCache from './TokenizerCache'
 import maxBy from 'lodash.maxby'
 
 const tokenizerCache = new TokenizerCache(
-  dialect => new BufferedTokenizer(dialect.tokenDefinitions)
+  dialect => new BufferedRegExpTokenizer(dialect.tokenDefinitions)
 )
 
-export default class BufferedScanner extends Scanner {
+export default class BufferedRegExpScanner extends Scanner {
   constructor (subject) {
     super(subject)
   }

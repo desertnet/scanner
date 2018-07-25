@@ -1,20 +1,20 @@
 import {expect} from 'chai'
 
-import {BufferedTokenizer, TokenDefinition} from '../src'
+import {BufferedRegExpTokenizer, TokenDefinition} from '../src'
 
-describe(`BufferedTokenizer`, function () {
+describe(`BufferedRegExpTokenizer`, function () {
   describe(`constructor()`, function () {
     it(`should throw when passed nothing`, function () {
-      expect(() => new BufferedTokenizer()).to.throw(TypeError)
+      expect(() => new BufferedRegExpTokenizer()).to.throw(TypeError)
     })
 
     it(`should throw when passed anything other than an array`, function () {
-      expect(() => new BufferedTokenizer('foo')).to.throw(TypeError)
+      expect(() => new BufferedRegExpTokenizer('foo')).to.throw(TypeError)
     })
 
     it(`should throw when passed an array that is not completely TokenDefinitions`, function () {
       const tokenDefinitions = [new TokenDefinition('foo', 'foo'), 'bar']
-      expect(() => new BufferedTokenizer(tokenDefinitions)).to.throw(TypeError)
+      expect(() => new BufferedRegExpTokenizer(tokenDefinitions)).to.throw(TypeError)
     })
   })
 
@@ -23,7 +23,7 @@ describe(`BufferedTokenizer`, function () {
 
     beforeEach(function () {
       const r = String.raw
-      tokenizer = new BufferedTokenizer([
+      tokenizer = new BufferedRegExpTokenizer([
         new TokenDefinition('WHITESPACE',  r`\s+`),
         new TokenDefinition('IF',          r`if`,      {ignoreCase: true}),
         new TokenDefinition('THEN',        r`then`),

@@ -2,7 +2,7 @@ import TokenDefinition from './TokenDefinition'
 
 const regexesSym = Symbol('regexes')
 
-export default class BufferedTokenizer {
+export default class BufferedRegExpTokenizer {
   constructor (tokenDefinitions) {
     if (tokenDefinitions === undefined) {
       throw new TypeError(`Missing tokenDefinitions argument`)
