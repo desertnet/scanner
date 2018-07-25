@@ -22,19 +22,15 @@ describe(`TokenDefinition`, function () {
       expect(() => new TokenDefinition(foo, '(bar')).to.throw(/foo.*invalid.*\(bar/i)
     })
 
-    it(`should throw if ignoreCase flag is not undefined or a boolean`, function () {
-      expect(() => new TokenDefinition('t', 'a', {ignoreCase: null})).to.throw(TypeError)
+    it(`should throw when passed non-object as flags`, function () {
+      expect(() => new TokenDefinition('tok', 'foo', 9)).to.throw(TypeError)
     })
 
-    it(`should set ignoreCase to false when passed no flags object`, function () {
-      expect(new TokenDefinition('t', 'a')).to.have.property('ignoreCase', false)
-    })
-
-    it(`should set ignoreCase to value from passed flags object`, function () {
-      expect(new TokenDefinition('t', 'a', {ignoreCase: true}))
-        .to.have.property('ignoreCase', true)
-      expect(new TokenDefinition('t', 'a', {ignoreCase: false}))
-        .to.have.property('ignoreCase', false)
+    it(`should set the flags property`, function () {
+      const flags = {ignoreCase: true}
+      expect(new TokenDefinition('tok', 'foo', flags))
+        .to.have.property('flags')
+        .that.equals(flags)
     })
   })
 })

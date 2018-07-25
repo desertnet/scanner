@@ -1,4 +1,5 @@
 import isString from 'lodash.isstring'
+import isPlainObject from 'lodash.isplainobject'
 
 export default class TokenDefinition {
   constructor (identifier, pattern, flags = {}) {
@@ -11,14 +12,12 @@ export default class TokenDefinition {
       throw new Error(`Token definition ${identifier.toString()} pattern: ${err.message}`)
     }
 
-    if ('ignoreCase' in flags) {
-      if (flags.ignoreCase !== true && flags.ignoreCase !== false) {
-        throw new TypeError(`Incorrect type for ignoreCase flag, expected boolean`)
-      }
+    if (!isPlainObject(flags)) {
+      throw new TypeError(`Expected plain object for flags paramter`)
     }
 
     this.identifier = identifier
     this.pattern = pattern
-    this.ignoreCase = flags.ignoreCase ? true : false
+    this.flags = flags
   }
 }
