@@ -3,11 +3,7 @@ import TokenDefinition from './TokenDefinition'
 const tokenDefsSym = Symbol('tokensDef')
 
 export default class Dialect {
-  constructor (identifier, tokenDefs) {
-    if (identifier === undefined) {
-      throw new TypeError(`Expected identifier`)
-    }
-
+  constructor (tokenDefs) {
     if (!Array.isArray(tokenDefs)) {
       throw new TypeError(`Expected array of token definitions`)
     }
@@ -22,7 +18,6 @@ export default class Dialect {
       }
     }
 
-    this.identifier = identifier
     this[tokenDefsSym] = new Set(tokenDefs)
   }
 

@@ -23,7 +23,7 @@ describe(`Scanner`, function () {
   })
 
   describe(`instance property`, function () {
-    const dialect = new Dialect('foo', [new TokenDefinition('foo', 'foo')])
+    const dialect = new Dialect([new TokenDefinition('foo', 'foo')])
 
     let scanner
     beforeEach(function () {

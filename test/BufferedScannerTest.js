@@ -13,7 +13,7 @@ describe(`BufferedScanner`, function () {
   })
 
   describe(`instance property`, function () {
-    const myLang = new Dialect('myLang', [
+    const myLang = new Dialect([
       new TokenDefinition('IF', 'if'),
       new TokenDefinition('THIS', 'this'),
       new TokenDefinition('THEN', 'then'),

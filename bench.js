@@ -6,7 +6,7 @@ const {BufferedScanner, Dialect, TokenDefinition} = require('./dist')
 const length = 100000
 const subject = Array(length).fill(`if (this) then {that}`, 0, length).join('\n')
 
-const myLang = new Dialect('myLang', [
+const myLang = new Dialect([
   new TokenDefinition('IF', String.raw`if`),
   new TokenDefinition('THIS', String.raw`this`),
   new TokenDefinition('THEN', String.raw`then`),
