@@ -1,7 +1,6 @@
 export {default as Token} from './lib/Token'
 export {default as Dialect} from './lib/Dialect'
 export {default as TokenDefinition} from './lib/TokenDefinition'
-export {default as BufferedRegExpTokenizer} from './lib/BufferedRegExpTokenizer'
 export {default as BufferedRegExpScanner} from './lib/BufferedRegExpScanner'
 export {default as Scanner, EOF, UnexpectedCharacter} from './lib/Scanner'
 export {default as createDialect} from './lib/createDialect'

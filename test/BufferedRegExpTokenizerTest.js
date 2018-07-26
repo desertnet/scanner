@@ -1,6 +1,7 @@
 import {expect} from 'chai'
 
-import {BufferedRegExpTokenizer, TokenDefinition} from '../src'
+import {TokenDefinition} from '../src'
+import BufferedRegExpTokenizer from '../src/lib/BufferedRegExpTokenizer'
 
 describe(`BufferedRegExpTokenizer`, function () {
   describe(`constructor()`, function () {
