@@ -3,6 +3,9 @@
   "version": "2.0.0",
   "description": "A regex-based string scanner/tokenizer",
   "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "rimraf dist && babel -s inline -D src -d dist",
     "clean": "rimraf dist coverage .nyc_output",
