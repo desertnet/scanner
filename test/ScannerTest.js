@@ -27,7 +27,7 @@ describe(`Scanner`, function () {
 
     let scanner
     beforeEach(function () {
-      scanner = new Scanner('foo')
+      scanner = new Scanner('foo\nbar')
     })
 
     describe(`determineNextTokenUsingDialect()`, function () {
@@ -65,6 +65,21 @@ describe(`Scanner`, function () {
               value: 'f'
             })
         })
+      })
+    })
+
+    describe(`lineNumberForOffset()`, function () {
+      it(`should return the line number for the offset in the subject`, function () {
+        expect(scanner.lineNumberForOffset(0)).to.equal(1)
+        expect(scanner.lineNumberForOffset(4)).to.equal(2)
+      })
+    })
+
+    describe(`columnNumberForOffset()`, function () {
+      it(`should return the column number for the offset in the subject`, function () {
+        expect(scanner.columnNumberForOffset(0)).to.equal(1)
+        expect(scanner.columnNumberForOffset(1)).to.equal(2)
+        expect(scanner.columnNumberForOffset(4)).to.equal(1)
       })
     })
   })

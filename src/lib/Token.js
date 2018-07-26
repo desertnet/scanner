@@ -21,11 +21,11 @@ export default class Token {
   }
 
   get line () {
-    return this.scanner.lineNumberMap.getLineNumberForOffset(this.start)
+    return this.scanner.lineNumberForOffset(this.start)
   }
 
   get column () {
-    return this.scanner.lineNumberMap.getColumnForOffset(this.start)
+    return this.scanner.columnNumberForOffset(this.start)
   }
 
   toString () {

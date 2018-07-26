@@ -3,6 +3,7 @@ import Token from './Token'
 import LineNumberMap from './LineNumberMap'
 
 const lineNumberMapProp = Symbol('lineNumberMapProp')
+const lineNumberMapAccessor = Symbol('lineNumberMapAccessor')
 
 export const EOF = Symbol('EOF')
 export const UnexpectedCharacter = Symbol('UnexpectedCharacter')
@@ -16,13 +17,6 @@ export default class Scanner {
     this.subject = subject
     this.position = 0
     this[lineNumberMapProp] = null
-  }
-
-  get lineNumberMap () {
-    if (this[lineNumberMapProp] === null) {
-      this[lineNumberMapProp] = new LineNumberMap(this.subject)
-    }
-    return this[lineNumberMapProp]
   }
 
   determineNextTokenUsingDialect () {
@@ -63,5 +57,20 @@ export default class Scanner {
       start: this.position,
       end: this.position + 1,
     })
+  }
+
+  get [lineNumberMapAccessor] () {
+    if (this[lineNumberMapProp] === null) {
+      this[lineNumberMapProp] = new LineNumberMap(this.subject)
+    }
+    return this[lineNumberMapProp]
+  }
+
+  lineNumberForOffset (offset) {
+    return this[lineNumberMapAccessor].getLineNumberForOffset(offset)
+  }
+
+  columnNumberForOffset (offset) {
+    return this[lineNumberMapAccessor].getColumnForOffset(offset)
   }
 }
