@@ -1,150 +1,186 @@
-# scanner
+# @desertnet/scanner
 
-A regex-based string scanner/tokenizer for JavaScript
+A lexical analyzer for JavaScript.
+
+
+## Compatibility
+
+Version 2 is a complete rewrite with a new API, and requires a number of ES6 features. If you need compatibility with older browsers, the [version 1 API](https://github.com/desertnet/scanner/tree/v1) is still supported.
+
 
 ## Installation
 
 ```shell
-npm install --save @desertnet/scanner
+npm install @desertnet/scanner
 ```
+
 
 ## Usage
 
-### An Example
+Let’s say you want to design a language for embedding things like images or videos in arbitrary text, using tags that look something like `[img-1]`. We can use this package to find those embedded tags.
 
 ```javascript
-const Scanner = require('@desertnet/scanner')
+import {createDialect, BufferedRegExpScanner} from '@desertnet/scanner'
 
-const body = `Hi! [img-1]
+const input = `Hi! [img-1]
 [img-2]
 Bye[!]`
+```
 
-const embedTagScanner = new Scanner([
-  {'tag': /\[\w+-\d+\]/},
-  {'text': /[^\[]+/},
-  {'bracket': /\[/}
-])
+First, declare the types of tokens you want to recognize.
 
-let token
-embedTagScanner.setSource(body)
-while (token = embedTagScanner.nextToken()) {
-  console.log(token)
+```javascript
+const tag = Symbol('tag')
+const text = Symbol('text')
+```
+
+Describe your language using regular expressions. `String.raw` can help you avoid needing to escape backslashes.
+
+```javascript
+const r = String.raw
+const embedTagLang = createDialect(
+  [ tag,  r`\[\w-\d+\]` ],
+  [ text, r`[^\[]+` ],
+  [ text, r`\[` ],
+)
+```
+
+Create a scanner to read the input string.
+
+```javascript
+const embedTagScanner = new BufferedRegExpScanner(input)
+```
+
+Iterate over the tokens and do something with them.
+
+```javascript
+for (const token of embedTagScanner.generateTokensUsingDialect(embedTagLang)) {
+  const {type, start, end, line, column, value} = token
+  console.log({type, start, end, line, column, value})
 }
 ```
 
-Outputs:
+Here’s what that outputs.
 
 ```
-Token { type: 'text',    value: 'Hi! ',    index: 0,  line: 1, column: 1 }
-Token { type: 'tag',     value: '[img-1]', index: 4,  line: 1, column: 5 }
-Token { type: 'text',    value: '\n',      index: 11, line: 2, column: 12 }
-Token { type: 'tag',     value: '[img-2]', index: 12, line: 2, column: 1 }
-Token { type: 'text',    value: '\nBye',   index: 19, line: 3, column: 8 }
-Token { type: 'bracket', value: '[',       index: 23, line: 3, column: 4 }
-Token { type: 'text',    value: '!]',      index: 24, line: 3, column: 5 }
+{ type: Symbol(text), start: 0,  end: 4,  line: 1, column: 1,  value: 'Hi! ' }
+{ type: Symbol(tag),  start: 4,  end: 11, line: 1, column: 5,  value: '[img-1]' }
+{ type: Symbol(text), start: 11, end: 12, line: 1, column: 12, value: '\n' }
+{ type: Symbol(tag),  start: 12, end: 19, line: 2, column: 1,  value: '[img-2]' }
+{ type: Symbol(text), start: 19, end: 23, line: 2, column: 8,  value: '\nBye' }
+{ type: Symbol(text), start: 23, end: 24, line: 3, column: 4,  value: '[' }
+{ type: Symbol(text), start: 24, end: 26, line: 3, column: 5,  value: '!]' }
 ```
 
-### Dialects
-
-In the context of this module, a **dialect** is an ordered mapping of a token-type to a regular expression that describes the token. In the above example you will see a `Scanner` object instantiated with an array of objects, with each object containing a single `RegExp` property. This pattern allows you to succinctly define a dialect for your scanner.
-
-We call a dialect an ordered mapping because the order in which the token types are defined is important. The scanner will attempt to match the input string against the first regex in the dialect. If that fails, it will go on to the next one in the list. Once a match is made, a token with the matching type is generated. No attempts to match any remaining regexes in the dialect are undertaken.
-
-It is generally a very good idea to ensure that your dialect accepts all inputs. If you do not, then an input string could cause the scanner to throw an "unexpected character" error. Notice in the example how the `text` token description matches everything that is not a `[` character, and the last token description matches a lone `[` character. This ensures that all inputs will generate a token. An alternate way of doing this would be to end your dialect with the following token description to match any single character:
-
-```javascript
-{'catchall': /[^]/}   // This is the same as `qr/./s` in Perl
-```
-
-### Multi-Dialect Scanners
-
-Often a language is simply not describable using a single dialect. For example, HTML often contains inline CSS. Or JavaDoc annotations inside Java comments. Even something simple like HTML attribute values denoted by `"` and HTML attribute values denoted by `'` may necessitate distinct dialect definitions.
-
-You can create a multi-dialect scanner by passing an object to the `Scanner` constructor. This object should be a mapping of dialect names to dialect definitions. For example, here is the start of a rather stripped down HTML multi-dialect scanner:
-
-```javascript
-const htmlScanner = new Scanner({
-  // Starting dialect, for content "outside of a tag".
-  "content": [
-    {"text": /[^<>]+/},
-    {"tagStart": /<[a-z][^\t\n\ \/\>]*/i},
-    {"closeTagStart": /<\/[a-z][^\t\n\ \/\>]*/i},
-    {"error": /[<>]/}
-  ],
-
-  // Dialect for the inside of tags.
-  "tag": [
-    {"tagEnd": />/},
-    {"whitespace": /\s+/},
-    {"selfClose": /\//},
-    {"error": /['"<=]/},
-    {"attributeStart": /[^>=\s\/]+/i}
-  ],
-
-  // Initial dialect for attributes.
-  "attribute": [
-    {"whitespace": /\s+/},
-    {"attributeValueQuotedStart": /=['"]/},
-    {"attributeValueStart": /=/},
-    {"tagEnd": />/},
-    {"selfClose": /\//},
-    {"error": /['"<]/},
-  ],
-
-  // Dialect for closing tags.
-  "closeTag": [
-    {"tagEnd": />/},
-    {"whitespace": /\s+/},
-    {"error": /[^\s>]+/}
-  ],
-
-  // ...
-
-})
-```
-
-Once you have a multi-dialect scanner you must call `scanner.pushDialect(dialectName)` to set the initial dialect. While you tokenize your string, you can call `.pushDialect()` and `.popDialect()` whenever your input changes contexts to a different dialect. (Alternately you may call `.setDialect()` directly, but do not mix this with using the scanner's dialect stack.)
 
 ## API
 
-### new Scanner(dialectDefinition)
+### new BufferedRegExpScanner(inputString)
 
-Constructs a new `Scanner` object with the given dialect definition(s). If `dialectDefinition` is an Array, then it is expected that the array contains a list of token descriptors, which is an object containing a single property that maps a token-type to a `RegExp`. If it is an object, then it is expected that each property maps a dialect name to an array of token descriptors. See the above definition of Dialects and Multi-Dialect scanners.
+A `Scanner` subclass that scans a string using JavaScript `RegExp` patterns. “Buffered” refers to the fact that the entire input must be buffered into a string before scanning can start. It operates on the principle of “maximal munch”: if more than one possible `TokenDefinition` matches, the longest match is the token that is produced. In the event of a tie, the first `TokenDefinition` passed to `Dialect` is chosen amongst the longest matches.
 
-#### .setSource(input)
+Supported `TokenDefinition` `flags`:
 
-Sets the input string for the scanner. If you are reusing a scanner instance, calling this method will reset the scanner to the beginning of the new string.
+  - `ignoreCase`: When set to `true`, acts like the `i` flag for regular expressions, causing the pattern to be case insensitive.
 
-#### .currentDialect()
+There are no specific properties for this `Scanner` subclass, see `Scanner` on how to use it to extract tokens from `inputString`.
 
-Returns a string which is the name of the current dialect. For single-dialect scanners this will always be `'main'`.
 
-#### .setDialect(name)
+### createDialect(...tokenDefinitions)
 
-Sets the current dialect to the dialect specified by the string `name`. You do not need to call this for single-dialect scanners. For multi-dialect scanners, you are probably better off using the methods for managing the scanner's dialect stack.
+This is a convenience function for creating a `Dialect` object with `TokenDefinition` objects. You pass it arrays of arguments to the `TokenDefinition` constructor, and a new `Dialect` object will be returned with those definitions.
 
-#### .pushDialect(name)
 
-Pushes the dialect specified by name onto the scanner's dialect stack, and sets it as the current dialect.
+### new Dialect(tokenDefinitions)
 
-#### .popDialect()
+A `Dialect` object is an ordered collection of `TokenDefinition` objects, passed as an array to this constructor. A dialect may be a complete language definition, or it may be a subset of a language.
 
-Pops the topmost dialect from the scanner's dialect stack, and sets the current dialect to the dialect that is now at the top of the stack.
+#### dialect.tokenDefinitions
 
-#### .nextToken([expectedTokens])
+An array of `TokenDefinition` objects that define the dialect.
 
-Returns a `Token` object for the next matching token in the source string. To scan a string, you keep calling this method until it returns `null`, which indicates the entire string has been scanned. This method can throw an error if the dialect cannot match the next token, so be sure to define your dialects to cover all inputs.
 
-The optional `expectedTokens` parameter is an array of token type names for the current dialect. Use this if it makes sense to only scan for a subset of token types. However, if you find yourself doing this, it may be better to switch to a multi-dialect scanner.
+### Scanner
 
-### new Scanner.Token(type, value, index, line, column)
+The `Scanner` class should not be instantiated directly. Instead, instantiate a subclass like `BufferedRegExpScanner`.
 
-Generally, instances of the `Token` class should not be instantiated directly. However the constructor is publicly available as it can be convenient to instantiate your own in tests.
+#### scanner.generateTokensUsingDialect(dialect)
 
-In typical usage, they are returned to you by `scanner.nextToken()`. They have the following readable properties:
+Returns a JavaScript `Generator` that yields `Token`s based on the passed `Dialect`. You can use this as the `Iterable` in a `for...of` loop.
 
-  - `type`: The name of the token type. (A string.)
-  - `value`: The matching substring from the input.
-  - `index`: The zero-based index of the start of the token in the input string.
-  - `line`: The one-based index of the line the token starts at in the input string.
-  - `column`: The one-based index of the column the token starts at within the line.
+In the event that no `TokenDefinition` in `dialect` matches, the generator will produce a final `Token` with a `type` property equal to the `UnexpectedCharacter` symbol and containing the `start` and `end` of the character. The `UnexpectedCharacter` symbol is exported by `@desertnet/scanner`. When this token is produced, the `position` property of scanner will not be updated.
+
+#### scanner.lineNumberForOffset(offset)
+
+Returns the line number for the passed `offset` of the input string.
+
+#### scanner.columnNumberForOffset(offset)
+
+Returns the column number for the passed `offset` of the input string.
+
+#### scanner.determineNextTokenUsingDialect(dialect)
+
+This method should never be invoked by anything other than the `Scanner` class. However, if you are making a subclass of `Scanner` you must implement this method. The expected return value is an array with two values: a token type identifier (the value of `token.type`), and the offset within the input string where the token ends (the value of `token.end`). If the end of the input is reached, it should return an array with the first value being that of the `EOF` symbol exported by `@desertnet/scanner`. If no token can be matched, `undefined` should be returned.
+
+#### scanner.subject
+
+The input string.
+
+#### scanner.position
+
+The offset into the input string that the scanner is currently evaluating.
+
+
+### Token
+
+The `Token` class should only be instantiated by the `Scanner` class.
+
+#### Memory Usage
+
+Instances of `Token` retain a reference to the `Scanner` that generated them, which will include a reference to the input string. This is so that properties like `value`, `line` and `column` can be computed on demand. However it does mean that to reclaim the memory used by the input string you must release any `Token` instances.
+
+#### token.type
+
+The token’s type identifier.
+
+#### token.start
+
+The offset into the input string where the token begins.
+
+#### token.end
+
+The offset into the input string where the token has ended. This is exclusive, so the offset of the last character of the token is actually `token.end - 1`. This is in keeping with how JavaScript string methods like `.slice()` work. It also allows for zero-length tokens to be represented, though it’s not clear if it is useful for a language to define tokens that can not have a length.
+
+#### token.value
+
+The string value of the token.
+
+#### token.line
+
+The line number that the token starts on. Note that this is a computed property, and the first access of it (or `token.column`) will trigger line number indexing of the input string. This means the first access of either `line` or `column` will be relatively slow, but subsequent accesses will be very fast.
+
+#### token.column
+
+The column number that the token starts on. Like `line`, this is a computed property; see `token.line` above for details.
+
+
+### new TokenDefinition(typeIdentifier, pattern, flags)
+
+A `TokenDefinition` defines a mapping of a pattern to a token type identifier. In other words, you provide a `pattern`, and when the scanner matches that pattern in the input string, a `Token` object with its `type` property set to the provided `typeIdentifier` is generated.
+
+  - `typeIdentifier`: A value used to identify the type of `Token` objects this definition produces. It can be of any type, but it is recommended that you use `Symbol`s for efficiency and to prevent unintended naming collisions.
+  - `pattern`: A string defining a pattern to be used by the scanner to match the input string. The format of this depends on the scanner implementation, but `BufferedRegExpScanner` expects JavaScript `RegExp` syntax.
+  - `flags`: A plain object with flags for the scanner implementation. For example, to tell `BufferedRegExpScanner` to match case insensitively for this pattern, you would pass `{ignoreCase: true}`.
+
+
+#### tokenDefinition.identifier
+
+The passed `typeIdentifier` constructor parameter.
+
+#### tokenDefinition.pattern
+
+The passed `pattern` constructor parameter.
+
+#### tokenDefinition.flags
+
+The passed `flags` constructor parameter.
