@@ -27,4 +27,12 @@ export default class Token {
   get column () {
     return this.scanner.lineNumberMap.getColumnForOffset(this.start)
   }
+
+  toString () {
+    const value = this.value
+      .replace(/\r/g, '\\r')
+      .replace(/\n/g, '\\n')
+      .replace(/'/g, '\\\'')
+    return `{ type: ${this.type.toString()}, start: ${this.start}, end: ${this.end}, line: ${this.line}, column: ${this.column}, value: '${value}' }`
+  }
 }
