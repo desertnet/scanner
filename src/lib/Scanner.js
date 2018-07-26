@@ -1,6 +1,7 @@
 import Dialect from './Dialect'
 import Token from './Token'
 import LineNumberMap from './LineNumberMap'
+import wholeCharLength from './wholeCharLength'
 
 const lineNumberMapProp = Symbol('lineNumberMapProp')
 const lineNumberMapAccessor = Symbol('lineNumberMapAccessor')
@@ -55,7 +56,7 @@ export default class Scanner {
       scanner: this,
       type: UnexpectedCharacter,
       start: this.position,
-      end: this.position + 1,
+      end: this.position + wholeCharLength(this.subject, this.position),
     })
   }
 

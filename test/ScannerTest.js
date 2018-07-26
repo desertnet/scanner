@@ -27,7 +27,7 @@ describe(`Scanner`, function () {
 
     let scanner
     beforeEach(function () {
-      scanner = new Scanner('foo\nbar')
+      scanner = new Scanner('foo\nbar\n🤣\n\uD83E\n\uD83E')
     })
 
     describe(`determineNextTokenUsingDialect()`, function () {
@@ -55,15 +55,52 @@ describe(`Scanner`, function () {
       })
 
       context(`when nothing in dialect matches`, function () {
-        it(`should return UnexpectedCharacter Token`, function () {
+        beforeEach(function () {
           sinon.stub(scanner, 'determineNextTokenUsingDialect')
             .returns(undefined)
-          expect(scanner.generateTokensUsingDialect(dialect).next().value)
-            .to.be.an.instanceof(Token)
-            .and.to.include({
-              type: UnexpectedCharacter,
-              value: 'f'
-            })
+        })
+
+        describe(`returned Token`, function () {
+          let token
+
+          beforeEach(function () {
+            token = scanner.generateTokensUsingDialect(dialect).next().value
+          })
+
+          it(`should have type of UnexpectedCharacter`, function () {
+            expect(token)
+              .to.be.an.instanceof(Token)
+              .and.to.include({
+                type: UnexpectedCharacter,
+                value: 'f'
+              })
+          })
+
+          it(`should have the correct length when next character is single-code-unit`, function () {
+            expect(token).to.have.property('start').that.equals(0)
+            expect(token).to.have.property('end').that.equals(1)
+          })
+
+          it(`should have the correct length when next character is multi-code-unit`, function () {
+            scanner.position = 8
+            const token = scanner.generateTokensUsingDialect(dialect).next().value
+            expect(token).to.have.property('start').that.equals(8)
+            expect(token).to.have.property('end').that.equals(10)
+          })
+
+          it(`should have the correct length when next character is invalid mutli-code-unit`, function () {
+            scanner.position = 11
+            const token = scanner.generateTokensUsingDialect(dialect).next().value
+            expect(token).to.have.property('start').that.equals(11)
+            expect(token).to.have.property('end').that.equals(12)
+          })
+
+          it(`should have the correct length when next character incomplete multi-code-unit`, function () {
+            scanner.position = 13
+            const token = scanner.generateTokensUsingDialect(dialect).next().value
+            expect(token).to.have.property('start').that.equals(13)
+            expect(token).to.have.property('end').that.equals(14)
+          })
         })
       })
     })
