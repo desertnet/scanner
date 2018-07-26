@@ -16,8 +16,7 @@ export default class BufferedRegExpScanner extends Scanner {
     if (this.position >= this.subject.length) return [EOF]
 
     const tokenizer = tokenizerCache.tokenizerForDialect(dialect)
-    tokenizer.subject = this.subject
 
-    return maxBy(tokenizer.findTokensAt(this.position), tok => tok[1])
+    return maxBy(tokenizer.findTokensAt(this.subject, this.position), tok => tok[1])
   }
 }

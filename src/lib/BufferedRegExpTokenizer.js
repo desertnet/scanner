@@ -21,16 +21,14 @@ export default class BufferedRegExpTokenizer {
       const flags = `gmy${tokenDef.flags.ignoreCase ? 'i' : ''}`
       this[regexesSym].set(tokenDef, new RegExp(tokenDef.pattern, flags))
     }
-
-    this.subject = null
   }
 
-  findTokensAt (offset) {
+  findTokensAt (subject, offset) {
     const tokens = []
 
     for (const [tokenDef, regex] of this[regexesSym]) {
       regex.lastIndex = offset
-      if (regex.test(this.subject)) {
+      if (regex.test(subject)) {
         tokens.push([tokenDef.identifier, regex.lastIndex])
       }
     }

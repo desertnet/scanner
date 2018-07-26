@@ -43,26 +43,22 @@ describe(`BufferedRegExpTokenizer`, function () {
       })
 
       it(`should ignore case regex when ignoreCase is specified on token definition`, function () {
-        tokenizer.subject = 'IF THEN'
-        expect(tokenizer.findTokensAt(0))
+        expect(tokenizer.findTokensAt('IF THEN', 0))
           .to.deep.equal([['IF', 2]])
       })
 
       it(`should match a token at start of string`, function () {
-        tokenizer.subject = 'if then'
-        expect(tokenizer.findTokensAt(0))
+        expect(tokenizer.findTokensAt('if then', 0))
           .to.deep.equal([['IF', 2]])
       })
 
       it(`should match token at start of offset`, function () {
-        tokenizer.subject = 'if then'
-        expect(tokenizer.findTokensAt(3))
+        expect(tokenizer.findTokensAt('if then', 3))
           .to.deep.equal([['THEN', 7]])
       })
 
       it(`should match multiple tokens when more than one defintion matches`, function () {
-        tokenizer.subject = 'a/*b /* comment */'
-        expect(tokenizer.findTokensAt(1))
+        expect(tokenizer.findTokensAt('a/*b /* comment */', 1))
           .to.deep.equal([
             ['DIVIDE', 2],
             ['COMMENT', 18],
