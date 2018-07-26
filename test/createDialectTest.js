@@ -7,37 +7,29 @@ describe(`createDialect()`, function () {
     expect(() => createDialect()).to.throw(TypeError)
   })
 
-  it(`should throw if passed something other than an object`, function () {
-    expect(() => createDialect([])).to.throw(TypeError)
-  })
-
-  it(`should throw if any values of passed object are not strings or array`, function () {
-    expect(() => createDialect({foo: 9})).to.throw(TypeError)
-  })
-
-  it(`should throw if passed object is empty`, function () {
+  it(`should throw if passed something other than an array`, function () {
     expect(() => createDialect({})).to.throw(TypeError)
   })
 
-  it(`should not throw when token types are Symbols`, function () {
-    expect(() => createDialect({[Symbol()]: 'foo'})).to.not.throw()
+  it(`should throw if any values of passed object are not arrays`, function () {
+    expect(() => createDialect([], {})).to.throw(TypeError)
   })
 
-  it(`should throw when token types are mixed strings and Symbols`, function () {
-    expect(() => createDialect({[Symbol()]: 'foo', bar: 'bar'})).to.throw(TypeError)
+  it(`should not throw when token types are Symbols`, function () {
+    expect(() => createDialect([Symbol(), 'foo'])).to.not.throw()
   })
 
   context(`returned value`, function () {
     it(`should be a Dialect object`, function () {
-      expect(createDialect({foo: 'foo'})).to.be.an.instanceof(Dialect)
+      expect(createDialect(['FOO', 'foo'])).to.be.an.instanceof(Dialect)
     })
 
     it(`should contain TokenDefinition objects in passed order`, function () {
-      const dialect = createDialect({
-        FOO: 'foo',
-        BAR: 'bar',
-        BAZ: 'baz'
-      })
+      const dialect = createDialect(
+        ['FOO', 'foo'],
+        ['BAR', 'bar'],
+        ['BAZ', 'baz'],
+      )
 
       const tokenDefs = dialect.tokenDefinitions
       expect(tokenDefs[0]).to.have.property('identifier').that.equals('FOO')
@@ -49,9 +41,9 @@ describe(`createDialect()`, function () {
     })
 
     it(`should contain TokenDefinition objects with passed flags`, function () {
-      const dialect = createDialect({
-        FOO: ['foo', {ignoreCase: true}]
-      })
+      const dialect = createDialect(
+        ['FOO', 'foo', {ignoreCase: true}]
+      )
 
       expect(dialect.tokenDefinitions[0])
         .to.have.property('flags')
