@@ -11,6 +11,14 @@ describe(`Scanner`, function () {
       expect(() => new Scanner()).to.throw(TypeError)
     })
 
+    it(`should not throw an error if passed subject is empty string`, function () {
+      expect(() => new Scanner('')).to.not.throw()
+    })
+
+    it(`should throw if passed subject is not a string`, function () {
+      expect(() => new Scanner(9)).to.throw(TypeError)
+    })
+
     it(`should set the subject property`, function () {
       const scanner = new Scanner('foo')
       expect(scanner.subject).to.equal('foo')

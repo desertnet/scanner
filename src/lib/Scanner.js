@@ -1,3 +1,5 @@
+import isString from 'lodash.isstring'
+
 import Dialect from './Dialect'
 import Token from './Token'
 import LineNumberMap from './LineNumberMap'
@@ -11,8 +13,12 @@ export const UnexpectedCharacter = Symbol('UnexpectedCharacter')
 
 export default class Scanner {
   constructor (subject) {
-    if (!subject) {
+    if (subject === undefined) {
       throw new TypeError(`Expected subject parameter to Scanner constructor`)
+    }
+
+    if (!isString(subject)) {
+      throw new TypeError(`Expected subject paramter to be a string`)
     }
 
     this.subject = subject
