@@ -8,10 +8,6 @@ const tokenizerCache = new TokenizerCache(
 )
 
 export default class BufferedRegExpScanner extends Scanner {
-  constructor (subject) {
-    super(subject)
-  }
-
   determineNextTokenUsingDialect (dialect) {
     if (this.position >= this.subject.length) return [EOF]
 
