@@ -4,12 +4,14 @@ import Dialect from './Dialect'
 import Token from './Token'
 import LineNumberMap from './LineNumberMap'
 import wholeCharLength from './wholeCharLength'
+import TokenDefinition from './TokenDefinition'
 
 const lineNumberMapProp = Symbol('lineNumberMapProp')
 const lineNumberMapAccessor = Symbol('lineNumberMapAccessor')
 
 export const EOF = Symbol('EOF')
 export const UnexpectedCharacter = Symbol('UnexpectedCharacter')
+const unexpectedCharacterDefinition = new TokenDefinition(UnexpectedCharacter, '.')
 
 export default class Scanner {
   constructor (subject) {
@@ -41,13 +43,14 @@ export default class Scanner {
 
     let tok
     while ((tok = this.determineNextTokenUsingDialect(dialect))) {
-      const [identifier, endOffset] = tok
+      const [definition, endOffset] = tok
 
-      if (identifier === EOF) return
+      if (definition === EOF) return
 
+      const typeOrDef = tok[0] instanceof TokenDefinition ? 'definition' : 'type'
       const token = new Token({
         scanner: this,
-        type: identifier,
+        [typeOrDef]: definition,
         start: this.position,
         end: endOffset,
       })
@@ -60,7 +63,7 @@ export default class Scanner {
     // match the next character.
     return new Token({
       scanner: this,
-      type: UnexpectedCharacter,
+      definition: unexpectedCharacterDefinition,
       start: this.position,
       end: this.position + wholeCharLength(this.subject, this.position),
     })

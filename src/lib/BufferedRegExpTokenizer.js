@@ -29,7 +29,7 @@ export default class BufferedRegExpTokenizer {
     for (const [tokenDef, regex] of this[regexesSym]) {
       regex.lastIndex = offset
       if (regex.test(subject)) {
-        tokens.push([tokenDef.identifier, regex.lastIndex])
+        tokens.push([tokenDef, regex.lastIndex])
       }
     }
 

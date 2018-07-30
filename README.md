@@ -120,7 +120,12 @@ Returns the column number for the passed `offset` of the input string.
 
 #### scanner.determineNextTokenUsingDialect(dialect)
 
-This method should never be invoked by anything other than the `Scanner` class. However, if you are making a subclass of `Scanner` you must implement this method. The expected return value is an array with two values: a token type identifier (the value of `token.type`), and the offset within the input string where the token ends (the value of `token.end`). If the end of the input is reached, it should return an array with the first value being that of the `EOF` symbol exported by `@desertnet/scanner`. If no token can be matched, `undefined` should be returned.
+This method should never be invoked by anything other than the `Scanner` class. However, if you are making a subclass of `Scanner` you must implement this method. The expected return value is an array with two values:
+
+  1. Either the matching `TokenDefinition` object, or the `identifier` value of the `TokenDefinition` object. If possible, always return the definition object, as it allows for more flexible parsers.
+  2. The offset within the input string where the token ends (the value of `token.end`).
+
+If the end of the input is reached, it should return an array with the first value being that of the `EOF` symbol exported by `@desertnet/scanner`. If no token can be matched, `undefined` should be returned instead of an array.
 
 #### scanner.subject
 

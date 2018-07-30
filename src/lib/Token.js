@@ -1,18 +1,21 @@
 const scannerProp = Symbol('scannerProp')
+const definitionProp = Symbol('definitionProp')
 const typeProp = Symbol('typeProp')
 const startProp = Symbol('startProp')
 const endProp = Symbol('endCacheProp')
 
 export default class Token {
-  constructor ({scanner, type, start, end}) {
+  constructor ({scanner, definition, type, start, end}) {
     this[scannerProp] = scanner
+    this[definitionProp] = definition
     this[typeProp] = type
     this[startProp] = start
     this[endProp] = end
   }
 
   get scanner () { return this[scannerProp] }
-  get type () { return this[typeProp] }
+  get definition () { return this[definitionProp] }
+  get type () { return this[typeProp] || this[definitionProp].identifier }
   get start () { return this[startProp] }
   get end () { return this[endProp] }
 

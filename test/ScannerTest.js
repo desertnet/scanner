@@ -62,6 +62,55 @@ describe(`Scanner`, function () {
           .that.is.a('function')
       })
 
+      context(`when determineNextTokenUsingDialect returns a TokenDefinition`, function () {
+        describe(`returned Token`, function () {
+          let token
+
+          beforeEach(function () {
+            sinon.stub(scanner, 'determineNextTokenUsingDialect')
+              .returns([dialect.tokenDefinitions[0], 3])
+            token = scanner.generateTokensUsingDialect(dialect).next().value
+          })
+
+          it(`should have correct definition property`, function () {
+            expect(token)
+              .to.have.property('definition')
+              .that.is.an.instanceof(TokenDefinition)
+              .and.equals(dialect.tokenDefinitions[0])
+          })
+
+          it(`should have type property that matches definition identifier`, function () {
+            expect(token)
+              .to.have.property('type')
+              .that.equals(dialect.tokenDefinitions[0].identifier)
+          })
+        })
+      })
+
+      context(`when determineNextTokenUsingDialect returns a non TokenDefinition`, function () {
+        describe(`returned Token`, function () {
+          let token
+
+          beforeEach(function () {
+            sinon.stub(scanner, 'determineNextTokenUsingDialect')
+              .returns(['foo', 3])
+            token = scanner.generateTokensUsingDialect(dialect).next().value
+          })
+
+          it(`should have undefined definition property`, function () {
+            expect(token)
+              .to.have.property('definition')
+              .that.equals(undefined)
+          })
+
+          it(`should have type property that matches definition identifier`, function () {
+            expect(token)
+              .to.have.property('type')
+              .that.equals(dialect.tokenDefinitions[0].identifier)
+          })
+        })
+      })
+
       context(`when nothing in dialect matches`, function () {
         beforeEach(function () {
           sinon.stub(scanner, 'determineNextTokenUsingDialect')
