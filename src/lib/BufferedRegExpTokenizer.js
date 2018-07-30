@@ -18,7 +18,7 @@ export default class BufferedRegExpTokenizer {
         throw new TypeError(`Expected TokenDefinition`)
       }
 
-      const flags = `gmy${tokenDef.flags.ignoreCase ? 'i' : ''}`
+      const flags = `gumy${tokenDef.flags.ignoreCase ? 'i' : ''}`
       this[regexesSym].set(tokenDef, new RegExp(tokenDef.pattern, flags))
     }
   }
